@@ -24,18 +24,33 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+# wud@wangjunx.top
+# 949501holdon0.0
+
 
 class EmailSystem:
     def __init__(self):
         self.EMail_UI = Tk()
-        self.user = ""
-        self.passwd = ""
+        self.user = "wud@wangjunx.top"
+        self.passwd = "949501holdon0.0"
         self.Smtp_Server = ""
         self.pop_server = ""
         self.receiver = ""
         self.subject = ""
         self._send_text = ""
         self.path = []
+
+    def pop3_init(self):
+        """与POP3服务器建立连接"""
+        try:
+            self.pop3_server = POP3("pop3.wangjunx.top")
+            self.pop3_server.user("wud@wangjunx.top")
+            self.pop3_server.pass_("949501holdon0.0")
+            # self.pop3_server = POP3(self.pop_server)
+            # self.pop3_server.user(self.user)
+            # self.pop3_server.pass_(self.passwd)
+        except Exception as e:
+            print "POP CONNECT ERROR ->", str(e)
 
     def destory_windows(self):
         self.remain_windows.destroy()
@@ -95,11 +110,26 @@ class EmailSystem:
         try:
             _path = easygui.fileopenbox()
             if _path is None:
+                # 没有选择文件
                 return 1
             else:
                 self.path.append(_path)
+                for i in self.path:
+                    # 显示添加到附件信息
+                    if self.path.index(i) == 0:
+                        Label(self.main_windows, text=i).place(x=250, y=(self.path.index(i)+1)*30 + 350)
+                    else:
+                        Label(self.main_windows, text=i).place(x=250, y=(self.path.index(i)+1)*20 + 360)
         except Exception as e:
             print "ADD FILE ERROR ->", str(e)
+
+    def main_windows_destroy(self):
+        """退出发送窗口, 填写数据清空"""
+        self.main_windows.destroy()  # 销毁控制台
+        self.path[:] = []  # 清空附件列表
+        self.receiver = ""
+        self.subject = ""
+        self._send_text = ""
 
     def send_windows(self):
         """邮件系统主控制台"""
@@ -146,13 +176,16 @@ class EmailSystem:
 
         # 按钮 发送+退出
         Button(self.main_windows, text="发送", command=self.send_email, width=10).place(x=600, y=350)  # 登陆成功后点击确认进入主要界面
-        Button(self.main_windows, text="退出", command=self.main_windows.destroy, width=10).place(x=700, y=350)  # 退出邮箱系统
+        Button(self.main_windows, text="退出", command=self.main_windows_destroy, width=10).place(x=700, y=350)  # 退出邮箱系统
         self.main_windows.mainloop()
 
     def delete_msg(self):
-        for i in range(0, 49):
+        """删除邮件"""
+        for i in range(0, len(self.msg)+1):
             if self.msg_list.select_includes(i):
-                self.msg_list.delete(i, i)
+                # self.pop3_server.dele(i)  # 从pop服务器中删除邮件
+                self.msg_list.delete(i, i)  # 在界面消失，并不从pop服务器删除
+                # print "功能正在添加"
 
     def sys_quit(self):
         """结束程序"""
@@ -160,17 +193,19 @@ class EmailSystem:
         sys.exit(0)
 
     def open_email(self, mouse):
+        """打开，阅读邮件"""
+        self.pop3_init()  # 等待时间可能过长，与pop3服务器重新建立连接
         # 找到当前邮件位置
-        for i in range(0, 49):
+        for i in range(0, len(self.msg)+1):
             if self.msg_list.select_includes(i):
-                localtion = i
+                id_flag = list(self.msg_list.curselection())[0]
+                print id_flag
                 break
-        rep, text, size = self.pop3_server.retr(localtion+1)
-        print text
+        rep, text, size = self.pop3_server.retr(self.stmp_num - id_flag)
         msg_content = b'\r\n'.join(text).decode('utf-8')
         msg = Parser().parsestr(msg_content)
-        list = Recv_email().info_digest(msg)  # 包含From To Subject
-
+        header_list = Recv_email().info_digest(msg)  # 包含From To Subject
+        content = Recv_email().email_box(msg)
         try:
             self.EMail_UI.destroy()  # 清除初始化窗口
             self.check.destroy()  # 清除提示窗口
@@ -178,7 +213,7 @@ class EmailSystem:
             pass
         self.open_email_windows = Tk()  # 主窗口控件
         self.open_email_windows.title("查阅邮件控制台")
-        self.open_email_windows.geometry('800x600')  # 控制台大小
+        self.open_email_windows.geometry('900x600')  # 控制台大小
         self.open_email_windows.resizable(width=True, height=True)
 
         # 当前用户信息
@@ -186,28 +221,28 @@ class EmailSystem:
         # Label(self.open_email_windows, text=self.user).place(x=635, y=10)
 
         # 提示文字
-        Label(self.open_email_windows, text="收件人:", background='#6699ff').place(x=10, y=10)
-        Label(self.open_email_windows, text="主题:", background='#6688ff').place(x=10, y=70)
-        Label(self.open_email_windows, text="来自:", background='#6677ff').place(x=10, y=40)
-        Label(self.open_email_windows, text="正文:", background='#6666ff').place(x=10, y=100)
+        Label(self.open_email_windows, text="发件人:", background='#6699ff').place(x=10, y=10)
+        Label(self.open_email_windows, text="主题:", background='#6688ff').place(x=10, y=40)
+        # Label(self.open_email_windows, text="来自:", background='#6677ff').place(x=10, y=40)
+        Label(self.open_email_windows, text="正文:", background='#6666ff').place(x=10, y=70)
 
         # 展示窗口 接收人+主题+邮件内容
-        self.param_3 = Label(self.open_email_windows, text=list[1])  # 收件人
-        self.param_3.place(x=70, y=10)
-        self.param_4 = Label(self.open_email_windows, text=list[2])  # 主题
-        self.param_4.place(x=70, y=70)
-        self.param_5 = Label(self.open_email_windows, text=list[0])  # 发件人
-        self.param_5.place(x=70, y=40)
+        # self.param_3 = Label(self.open_email_windows, text=list[1])  # 收件人
+        # self.param_3.place(x=70, y=10)
+        self.param_4 = Label(self.open_email_windows, text=header_list[2])  # 主题
+        self.param_4.place(x=70, y=40)
+        self.param_5 = Label(self.open_email_windows, text=header_list[0])  # 发件人
+        self.param_5.place(x=70, y=10)
 
         # 滚动条
         scroll_bar = Scrollbar(self.open_email_windows)
         scroll_bar.pack(side=RIGHT, fill=Y)
 
         # 文件内容
-        text_info = Text(self.open_email_windows, yscrollcommand=scroll_bar.set, width=100, height=30)
-        text_info.place(x=70, y=100)
-        for line in text:
-            text_info.insert(END, line)
+        text_info = Text(self.open_email_windows, yscrollcommand=scroll_bar.set, font="宋体,15", width=100, height=30)
+        text_info.place(x=70, y=70)
+        # text_info.insert(END, content)
+        text_info.insert(END, content)
 
         # 添加附件按钮
         # Button(self.open_email_windows, text="添加附件", command=self.add_file, width=10).place(x=10, y=390)
@@ -222,14 +257,19 @@ class EmailSystem:
         # 按钮 发送+退出
         # Button(self.open_email_windows, text="发送", command=self.send_email, width=10).place(x=600, y=350)  # 登陆成功后点击确认进入主要界面
 
-        Button(self.open_email_windows, text="退出", command=self.open_email_windows.destroy, width=10).place(x=700, y=550)  # 退出邮箱系统
+        Button(self.open_email_windows, text="退出", command=self.open_email_windows.destroy, width=10).place(x=800, y=560)  # 退出邮箱系统
         self.open_email_windows.mainloop()
+
+    def black_list(self):
+        """黑名单模块"""
+        self.black_lists = Tk()
+        self.black_lists
 
     def index_windows(self):
         """主界面"""
         self.index_window = Tk()
         self.index_window.title("index windows")
-        self.index_window.resizable(width=True, height=True)
+        self.index_window.resizable(width=False, height=False)
         self.index_window.geometry('900x700')
 
         # 当前用户信息
@@ -239,10 +279,12 @@ class EmailSystem:
         # 滚动条
         scroll_bar = Scrollbar(self.index_window)
         scroll_bar.pack(side=RIGHT, fill=Y)
-
+        scroll_bar_x = Scrollbar(self.index_window)
+        scroll_bar_x.pack(side=BOTTOM, fill=X)
 
         # 收件信息窗口
-        self.msg_list = Listbox(self.index_window, yscrollcommand=scroll_bar.set, width=110, height=20, font="宋体,15",selectmode=BROWSE)
+        self.msg_list = Listbox(self.index_window, yscrollcommand=scroll_bar.set, xscrollcommand=scroll_bar_x.set,
+                                width=110, height=30, font="宋体,15", selectmode=BROWSE)
         self.msg_list.place(x=0, y=30)
         self.msg_list.bind(sequence="<Double-Button-1>", func=self.open_email)
 
@@ -263,18 +305,20 @@ class EmailSystem:
         Label(self.index_window, text="收件箱: " + str(len(self.msg)) + "封", bg="#e6ebe0", font="黑体, 15").place(x=0, y=0)
 
         all_recv_email = []
-        for i in range(1, len(self.msg)+1):
+        email_num = len(self.msg)
+        self.stmp_num = email_num
+        while email_num > 0:
             try:
-                rep, text, size = self.pop3_server.retr(i)
+                rep, text, size = self.pop3_server.retr(email_num)
                 msg_content = b'\r\n'.join(text).decode().encode('utf-8')
                 msg = Parser().parsestr(msg_content)
                 list = Recv_email().info_digest(msg)
-                list.insert(0, str(i)+" : ")
+                list.insert(0, str(self.stmp_num - email_num +1) + " : ")
                 all_recv_email.append(list)
             except Exception as e:
-                # print msg
                 print "POP PARSER ERROR ->", str(e)
                 pass
+            email_num -= 1
 
         for item in all_recv_email:
             try:
@@ -285,33 +329,33 @@ class EmailSystem:
                 parma = Id + From + To + Subject
                 self.msg_list.insert(END, parma)
             except Exception as e:
-                print parma
+                # print parma
                 print "ADD RECV ERROR ->", str(e)
         scroll_bar.config(command=self.msg_list.yview)
 
         # 收件箱按钮
-        Button(self.index_window, text="已发送", command=self.delete_msg, width=8). place(x=200, y=0)
+        # Button(self.index_window, text="已发送", command=self.delete_msg, width=8). place(x=200, y=0)
 
         # 删除按钮
-        Button(self.index_window, text="删除", command=self.delete_msg, width=8). place(x=0, y=400)
+        Button(self.index_window, text="删除", command=self.delete_msg, width=8). place(x=0, y=580)
 
         # 刷新按钮
-        Button(self.index_window, text="刷新", command=self.delete_msg, width=8). place(x=90, y=400)
+        Button(self.index_window, text="刷新", command=self.delete_msg, width=8). place(x=90, y=580)
 
         # 读取按钮
-        Button(self.index_window, text="打开", command=self.delete_msg, width=8). place(x=180, y=400)
+        # Button(self.index_window, text="打开", command=self.delete_msg, width=8). place(x=180, y=580)
 
         # 写信按钮
-        Button(self.index_window, text="写信", command=self.send_windows, width=8). place(x=680, y=400)
+        Button(self.index_window, text="写信", command=self.send_windows, width=8). place(x=680, y=580)
 
         # 退出按钮
-        Button(self.index_window, text="退出", command=self.sys_quit, width=8). place(x=780, y=400)
+        Button(self.index_window, text="退出", command=self.sys_quit, width=8). place(x=780, y=580)
 
         # 邮箱信息验证？
         # 待添加
 
         # 伪造邮件地址黑名单
-        Button(self.index_window, text="添加黑名单", command=self.sys_quit, width=8). place(x=780, y=600)
+        Button(self.index_window, text="设置黑名单", command=self.black_list, width=8). place(x=780, y=620)
         # 功能待添加
 
         # 删除其他窗口
@@ -332,8 +376,8 @@ class EmailSystem:
         self.check.resizable(width=False, height=False)
         remain_info_text = Frame(self.check)
         try:
-            self.user = self.param_1.get()
-            self.passwd = self.param_2.get()
+            # self.user = self.param_1.get()
+            # self.passwd = self.param_2.get()
             self.Smtp_Server = "smtp." + self.user[self.user.index('@')+1:]  # smtp服务器
             self.pop_server = "pop3." + self.user[self.user.index('@')+1:]  # pop服务器
         except:
@@ -402,4 +446,4 @@ class EmailSystem:
 
 if __name__ == '__main__':
     E = EmailSystem()
-    E.main()
+    E.index_windows()
