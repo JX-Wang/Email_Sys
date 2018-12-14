@@ -10,11 +10,11 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-pop3_server = POP3("pop3.wangjunx.top")
-pop3_server.user("wud@wangjunx.top")
-pop3_server.pass_("949501holdon0.0")
-rep, msg, size = pop3_server.list()
-print rep
+# pop3_server = POP3("pop3.wangjunx.top")
+# pop3_server.user("wud@wangjunx.top")
+# pop3_server.pass_("949501holdon0.0")
+# rep, msg, size = pop3_server.list()
+# print rep
 
 
 class Recv_email:
@@ -134,16 +134,17 @@ class Recv_email:
 
 
 if __name__ == '__main__':
-    for i in range(1, 31):
-        try:
-            rep, text, size = pop3_server.retr(i)
-            # for line in text:
-            #     print line
-            # print "END --------------------------------------------- END"
-            msg_content = b'\r\n'.join(text).decode().encode('utf-8')
-            msg = Parser().parsestr(msg_content)
-            Recv_email().email_box(msg)
-        except Exception as e:
-            print str(e)
-    pop3_server.quit()
+    pass
+    # for i in range(1, 31):
+    #     try:
+    #         rep, text, size = pop3_server.retr(i)
+    #         # for line in text:
+    #         #     print line
+    #         # print "END --------------------------------------------- END"
+    #         msg_content = b'\r\n'.join(text).decode().encode('utf-8')
+    #         msg = Parser().parsestr(msg_content)
+    #         Recv_email().email_box(msg)
+    #     except Exception as e:
+    #         print str(e)
+    # pop3_server.quit()
 

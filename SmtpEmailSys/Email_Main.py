@@ -8,8 +8,8 @@ Data   @ 2018.12.4
 Ver    @ 1.0
 Others : NONE
 """
-from Recv_email import Recv_email
-
+from Recv_email import Recv_email  # 邮件解析模块儿
+from Encryption import Encryption  # 加密模块儿
 from email.parser import Parser
 from Tkinter import *  # UI
 from tkinter import ttk
@@ -20,9 +20,10 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 import easygui  # 选择附件窗口
 
-import sys
+import sys  # 中文编码问题
 reload(sys)
 sys.setdefaultencoding('utf-8')
+
 
 # wud@wangjunx.top
 # 949501holdon0.0
@@ -31,24 +32,23 @@ sys.setdefaultencoding('utf-8')
 class EmailSystem:
     def __init__(self):
         self.EMail_UI = Tk()
-        self.user = "wud@wangjunx.top"
-        self.passwd = "949501holdon0.0"
+        self.user = ""
+        self.passwd = ""
         self.Smtp_Server = ""
         self.pop_server = ""
         self.receiver = ""
         self.subject = ""
         self._send_text = ""
         self.path = []
+        self.black_lists = []  # 黑名单
+        self.black_num = 0
 
     def pop3_init(self):
         """与POP3服务器建立连接"""
         try:
-            self.pop3_server = POP3("pop3.wangjunx.top")
-            self.pop3_server.user("wud@wangjunx.top")
-            self.pop3_server.pass_("949501holdon0.0")
-            # self.pop3_server = POP3(self.pop_server)
-            # self.pop3_server.user(self.user)
-            # self.pop3_server.pass_(self.passwd)
+            self.pop3_server = POP3(self.pop_server)
+            self.pop3_server.user(self.user)
+            self.pop3_server.pass_(self.passwd)
         except Exception as e:
             print "POP CONNECT ERROR ->", str(e)
 
@@ -68,8 +68,17 @@ class EmailSystem:
         msg['From'] = 'WUD_EMAIL_SYSTEM <' + self.user + '>'
         msg['To'] = self.receiver
         msg['Subject'] = self.subject
-        _send_text = MIMEText(self._send_text, 'plain', 'utf-8')
+        _send_text = Encryption().Encry_text(str(self._send_text))  # AES加密后的密文
+        _send_text = MIMEText(_send_text, 'plain', 'utf-8')
         msg.attach(_send_text)
+
+        # 加密文件
+        cipher_path = []
+        for path in self.path:
+            cipher_path.append(Encryption().Encry_file(path))  # 加密图片文件
+        self.path[:] = []
+        for path in cipher_path:
+            self.path.append(path)  # 将加密后的附件路径添加至发送列表
 
         # 添加附件 文件路径不能包含中文
         if len(self.path) != 0:
@@ -171,7 +180,7 @@ class EmailSystem:
         Label(self.main_windows, text="加密方式:").place(x=10, y=350)
         self.encryption = ttk.Combobox(self.main_windows)
         self.encryption.place(x=70, y=350)
-        self.encryption['value'] = ('rc4_md5', 'RSA', 'DES', 'AES', 'IDEA')
+        self.encryption['value'] = ('AES', "base64")  # 默认使用AES加密，还有一个激就是默认的base64
         self.encryption.current(0)  # 默认rc4_md5加密
 
         # 按钮 发送+退出
@@ -183,9 +192,8 @@ class EmailSystem:
         """删除邮件"""
         for i in range(0, len(self.msg)+1):
             if self.msg_list.select_includes(i):
-                # self.pop3_server.dele(i)  # 从pop服务器中删除邮件
+                self.pop3_server.dele(i)  # 从pop服务器中删除邮件
                 self.msg_list.delete(i, i)  # 在界面消失，并不从pop服务器删除
-                # print "功能正在添加"
 
     def sys_quit(self):
         """结束程序"""
@@ -204,6 +212,7 @@ class EmailSystem:
         rep, text, size = self.pop3_server.retr(self.stmp_num - id_flag)
         msg_content = b'\r\n'.join(text).decode('utf-8')
         msg = Parser().parsestr(msg_content)
+        print msg
         header_list = Recv_email().info_digest(msg)  # 包含From To Subject
         content = Recv_email().email_box(msg)
         try:
@@ -260,10 +269,49 @@ class EmailSystem:
         Button(self.open_email_windows, text="退出", command=self.open_email_windows.destroy, width=10).place(x=800, y=560)  # 退出邮箱系统
         self.open_email_windows.mainloop()
 
-    def black_list(self):
+    def add_black_list(self):
+        """处理黑名单"""
+        black_name = self.black_name.get()
+        if black_name == "":
+            print black_name
+            print "no message"
+        else:
+            print black_name
+            self.black_lists.append(str(black_name))
+            self.black_list.insert(END, str(black_name))
+
+    def delete_black_name(self):
+        self.black_lists[:] = []
+        self.black_list.delete(self.black_list.curselection(), self.black_list.curselection())
+
+    def black_list_windows(self):
         """黑名单模块"""
-        self.black_lists = Tk()
-        self.black_lists
+        self.bl_windows = Tk()
+        self.bl_windows.title("邮箱黑名单")
+        self.bl_windows.geometry("300x200")
+        self.bl_windows.resizable(width=False, height=False)
+
+        # 输入窗口
+        self.black_name = Entry(self.bl_windows)
+        self.black_name.place(x=10, y=10)
+
+        # 滚动条
+        scroll_bar = Scrollbar(self.bl_windows)
+        scroll_bar.pack(side=RIGHT, fill=Y)
+
+        # 按钮
+        Button(self.bl_windows, text=" 加入 ", command=self.add_black_list).place(x=170, y=9)
+        Button(self.bl_windows, text=" 清空 ", command=self.delete_black_name).place(x=220, y=9)
+
+        # 显示
+        self.black_list = Listbox(self.bl_windows, yscrollcommand=scroll_bar.set, width=35)
+        self.black_list.place(x=10, y=40)
+
+        if len(self.black_lists) != 0:
+            for bl in self.black_lists:
+                self.black_list.insert(END, bl)
+
+        self.bl_windows.mainloop()
 
     def index_windows(self):
         """主界面"""
@@ -284,25 +332,19 @@ class EmailSystem:
 
         # 收件信息窗口
         self.msg_list = Listbox(self.index_window, yscrollcommand=scroll_bar.set, xscrollcommand=scroll_bar_x.set,
-                                width=110, height=30, font="宋体,15", selectmode=BROWSE)
+                              width=110, height=30, font="宋体,15", selectmode=BROWSE)
         self.msg_list.place(x=0, y=30)
         self.msg_list.bind(sequence="<Double-Button-1>", func=self.open_email)
 
         # 登陆POP服务器 POP.XXX.XXX
         try:
-            self.pop3_server = POP3("pop3.wangjunx.top")
-            self.pop3_server.user("wud@wangjunx.top")
-            self.pop3_server.pass_("949501holdon0.0")
-            # self.pop3_server = POP3(self.pop_server)
-            # self.pop3_server.user(self.user)
-            # self.pop3_server.pass_(self.passwd)
+            self.pop3_server = POP3(self.pop_server)
+            self.pop3_server.user(self.user)
+            self.pop3_server.pass_(self.passwd)
         except Exception as e:
             print "POP CONNECT ERROR ->", str(e)
 
         rep, self.msg, size = self.pop3_server.list()  # self.msg为全部收信
-
-        # 提示信息
-        Label(self.index_window, text="收件箱: " + str(len(self.msg)) + "封", bg="#e6ebe0", font="黑体, 15").place(x=0, y=0)
 
         all_recv_email = []
         email_num = len(self.msg)
@@ -313,7 +355,7 @@ class EmailSystem:
                 msg_content = b'\r\n'.join(text).decode().encode('utf-8')
                 msg = Parser().parsestr(msg_content)
                 list = Recv_email().info_digest(msg)
-                list.insert(0, str(self.stmp_num - email_num +1) + " : ")
+                list.insert(0, str(self.stmp_num - email_num + 1) + " : ")
                 all_recv_email.append(list)
             except Exception as e:
                 print "POP PARSER ERROR ->", str(e)
@@ -321,17 +363,34 @@ class EmailSystem:
             email_num -= 1
 
         for item in all_recv_email:
-            try:
+            if len(self.black_lists) != 0:
+                if str(item[1]).find(self.black_lists[0]) != -1:
+                    print self.black_lists[0]
+                    print "THIS EMAIL IN BLACK LIST"
+                    self.black_num += 1
+                    pass
+                else:
+                    print str(item[1])
+                    Id = str(item[0])
+                    From = 'From: ' + str(item[1])
+                    To = 'To: ' + str(item[2])
+                    Subject = 'Subject: ' + item[3]
+                    parma = Id + From + To + Subject
+                    self.msg_list.insert(END, parma)
+            else:
+                self.black_num = 0
                 Id = str(item[0])
                 From = 'From: ' + str(item[1])
                 To = 'To: ' + str(item[2])
                 Subject = 'Subject: ' + item[3]
                 parma = Id + From + To + Subject
                 self.msg_list.insert(END, parma)
-            except Exception as e:
-                # print parma
-                print "ADD RECV ERROR ->", str(e)
+            # print parma
         scroll_bar.config(command=self.msg_list.yview)
+
+        # 提示信息
+        Label(self.index_window, text="收件箱: " + str(len(self.msg) - self.black_num) + "封", bg="#e6ebe0",
+              font="黑体, 15").place(x=0, y=0)
 
         # 收件箱按钮
         # Button(self.index_window, text="已发送", command=self.delete_msg, width=8). place(x=200, y=0)
@@ -340,7 +399,7 @@ class EmailSystem:
         Button(self.index_window, text="删除", command=self.delete_msg, width=8). place(x=0, y=580)
 
         # 刷新按钮
-        Button(self.index_window, text="刷新", command=self.delete_msg, width=8). place(x=90, y=580)
+        Button(self.index_window, text="刷新", command=self.index_windows, width=8). place(x=90, y=580)
 
         # 读取按钮
         # Button(self.index_window, text="打开", command=self.delete_msg, width=8). place(x=180, y=580)
@@ -355,8 +414,7 @@ class EmailSystem:
         # 待添加
 
         # 伪造邮件地址黑名单
-        Button(self.index_window, text="设置黑名单", command=self.black_list, width=8). place(x=780, y=620)
-        # 功能待添加
+        Button(self.index_window, text="设置黑名单", command=self.black_list_windows, width=8). place(x=780, y=620)
 
         # 删除其他窗口
         try:
@@ -376,8 +434,8 @@ class EmailSystem:
         self.check.resizable(width=False, height=False)
         remain_info_text = Frame(self.check)
         try:
-            # self.user = self.param_1.get()
-            # self.passwd = self.param_2.get()
+            self.user = self.param_1.get()
+            self.passwd = self.param_2.get()
             self.Smtp_Server = "smtp." + self.user[self.user.index('@')+1:]  # smtp服务器
             self.pop_server = "pop3." + self.user[self.user.index('@')+1:]  # pop服务器
         except:
@@ -446,4 +504,4 @@ class EmailSystem:
 
 if __name__ == '__main__':
     E = EmailSystem()
-    E.index_windows()
+    E.main()
