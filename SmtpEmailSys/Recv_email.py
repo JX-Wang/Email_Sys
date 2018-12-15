@@ -10,19 +10,13 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-# pop3_server = POP3("pop3.wangjunx.top")
-# pop3_server.user("wud@wangjunx.top")
-# pop3_server.pass_("949501holdon0.0")
-# rep, msg, size = pop3_server.list()
-# print rep
-
 
 class Recv_email:
     def __init__(self):
         pass
-        # self.pop3_server = POP3("pop3.wangjunx.top")
-        # self.pop3_server.user("wud@wangjunx.top")
-        # self.pop3_server.pass_("949501holdon0.0")
+        # self.pop3_server = POP3("x")
+        # self.pop3_server.user("x")
+        # self.pop3_server.pass_("x")
         # rep, self.msg, size = self.pop3_server.list()  # self.msg为全部收信
 
     def guess_charset(self, msg):
