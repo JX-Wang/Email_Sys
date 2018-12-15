@@ -11,10 +11,10 @@ ver 0.1
 from email.mime.text import MIMEText
 import smtplib
 
-sender = "wud@wangjunx.top"
-sender_pass = "949501holdon0.0"
-receiver = ["1411349759@qq.com", "1052066743@qq.com"]
-smtp_server = "smtp.wangjunx.top"
+sender = "x"
+sender_pass = "x"
+receiver = ["x", "x"]
+smtp_server = "x"
 
 
 
