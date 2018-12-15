@@ -25,10 +25,6 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 
-# wud@wangjunx.top
-# 949501holdon0.0
-
-
 class EmailSystem:
     def __init__(self):
         self.EMail_UI = Tk()
