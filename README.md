@@ -1,5 +1,7 @@
 # Email_Sys
 A Email based python2.7
+
+
 2018.12.11
  + 解决邮件正文编码问题
  + 解决读取列表与pop3服务器序列匹配问题
