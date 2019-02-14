@@ -19,7 +19,7 @@
 #### 删除邮件  
   [image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/delete_email.png)  
 #### 写邮件控制台  
-  [image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/email_view.png)  
+  [image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/write_email.png)  
 #### 添加附件  
   [image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/extra.png)
 #### 加密邮件（文本与附件）  
@@ -36,6 +36,7 @@
   WUD(@wjx)  
   wud@wangjunx.top wjx.wud@gmail.com  
   Harbin Institute of Technology At WeiHai  
+  
   [wjx的博客](http://www.wudly.cn)
 
   
