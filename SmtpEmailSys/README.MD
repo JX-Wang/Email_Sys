@@ -18,7 +18,7 @@
   ![image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/view.png)  
 #### 删除邮件  
   [image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/delete_email.png)  
-#### 发送邮件  
+#### 写邮件控制台  
   [image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/write_email.png)  
 #### 添加附件  
   [image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/extra.png)
