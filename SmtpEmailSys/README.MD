@@ -17,26 +17,25 @@
 #### 查阅控制台  
   ![image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/email_view.png)  
 #### 删除邮件  
-  [image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/delete_email.png)  
+  ![image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/delete_email.png)  
 #### 写邮件控制台  
-  [image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/write_email.png)  
+  ![image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/write_email.png)  
 #### 添加附件  
-  [image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/extra.png)
+  ![image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/extra.png)
 #### 加密邮件（文本与附件）  
-  [image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/encrypt.png)  
+  ![image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/encrypt.png)  
 #### 发送结果  
-  [image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/send_result.png)  
+  ![image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/send_result.png)  
 #### 解密邮件（文本与附件）  
-  [image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/decrypt.png)  
+  ![image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/decrypt.png)  
 #### 黑名单过滤    
-  [image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/add_black_list.png)  
-  [image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/add_black_list_ref.png)  
-  [image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/add_black_list_ref1.png)  
+  ![image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/add_black_list.png)  
+  ![image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/add_black_list_ref.png)  
+  ![image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/add_black_list_ref1.png)  
 ### Contact  
   WUD(@wjx)  
   wud@wangjunx.top wjx.wud@gmail.com  
   Harbin Institute of Technology At WeiHai  
-  
   [wjx的博客](http://www.wudly.cn)
 
   
