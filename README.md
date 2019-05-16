@@ -1,24 +1,7 @@
 # A Simple Email Sysytem (base Python 2.7)
 ---  
-*Give me a Star or Follow me if You like this Repo*
-
-2018.12.11
- + 解决邮件正文编码问题
- + 解决读取列表与pop3服务器序列匹配问题
- + 解决数据冲突问题
- - 去掉没必要的控件
- - 去掉发件箱查看功能
- ~ 附件以及正文的加密
- ~ 黑白名单过滤
- ~ 邮箱信息验证
-2018.12.12
- + 正文以及附件的加密 AES，base64
- ~ 黑白名单过滤
- ~ 邮箱信息验证
-2018.12.13
- + 黑名单过滤
- 
-*注： 只适用于阿里云企业邮箱*
+*Give me a Star or Follow me if You like this Repo*  
+*注： 只适用于阿里云企业邮箱，其他邮箱没做测试*
 ### Features
   * 邮件阅读
   * 邮件接收与发送
@@ -52,9 +35,7 @@
   ![image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/add_black_list_ref.png)  
   ![image](https://github.com/JX-Wang/Email_Sys/blob/master/SmtpEmailSys/Demo/add_black_list_ref1.png)  
 ### Contact  
-  WUD(@wjx)  
-  wud@wangjunx.top wjx.wud@gmail.com  
-  Harbin Institute of Technology At WeiHai  
+  wud@wangjunx.top  
   [wjx的博客](http://www.wudly.cn)
 
   
